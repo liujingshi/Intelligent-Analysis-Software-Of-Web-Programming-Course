@@ -1,2 +1,15 @@
 # Intelligent-Analysis-Software-Of-Web-Programming-Course
-Web编程课程教学案例智能分析软件
+
+* Web编程课程教学案例智能分析软件
+    
+    * 额 这个英文名起长了
+
+    * 使用ThinkPHP5框架开发
+
+    * 使用Python处理数据
+
+    * 前端采用layUI框架
+
+    * 暂时没用数据库呢
+
+        * 用的话就用MySQL
