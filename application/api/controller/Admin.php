@@ -3,6 +3,7 @@ namespace app\api\controller;
 
 use \think\Session;
 use \think\Request;
+use \think\Db;
 
 /**
  * 后台API接口
@@ -43,8 +44,40 @@ class Admin
         return redirect('error/error/four_zero_four');
     }
 
-    public function index()
-    {
-        return $this->goto404();
+    /**
+     * 返回状态的JSON字符串
+     * 参数: 状态字符串
+     * 返回值: JSON字符串
+     */
+    private function state($state) {
+        $result = [
+            'state' => $state
+        ];
+        return json_encode($result);
     }
+
+    /**
+     * 管理员登录接口
+     * 参数: Ajax POST 'username' 'password'
+     * 返回值: JSON state => 'success' 'fail'
+     */
+    public function login() {
+        if ($this->checkMethod()) {
+            $request = Request::instance();
+            $post = $request->param();
+            $data = [
+                'username' => $post['username'],
+                'password' => md5($post['password'])
+            ];
+            if (Db::table('admin')->where($data)->find()) {
+                Session::set('admin', '');
+                return $this->state('success');
+            } else {
+                return $this->state('fail');
+            }
+        } else {
+            return $this->goto404();
+        }
+    }
+
 }
