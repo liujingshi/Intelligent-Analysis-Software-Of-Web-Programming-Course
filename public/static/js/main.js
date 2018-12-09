@@ -13,8 +13,8 @@ var popup = {
         })
     },
 
-    load: function () {
-        return this.layer.msg("验证中...", { icon: 16, shade: 0.3, time: 10000 })
+    load: function (msg) {
+        return this.layer.msg(msg, { icon: 16, shade: 0.3, time: 10000 })
     },
 
     msg: function (msg, ico = 'none', time = 1500) {
@@ -56,7 +56,7 @@ var adminLogin = function (username, password) {
     if (username == "" || password == "") {
         popup.msg('用户名或密码不能为空', 'no')
     } else {
-        var load = popup.load()
+        var load = popup.load('验证中...')
         $.post('/api/admin/login', {
             username: username,
             password: password
