@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>后台登录 - Web编程课程教学案例智能分析软件</title>
+    <link rel="stylesheet" href="/static/layui/css/layui.css">
+    <link rel="stylesheet" href="/static/css/main.css">
+    <style>
+        body {
+            background: #ebebeb;
+        }
+        .layui-card {
+            width: 500px;
+            height: 300px;
+            position: absolute;
+            top: calc(50% - 150px);
+            left: calc(50% - 250px);
+        }
+        .captcha {
+            height: 30px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="layui-card">
+        <div class="layui-card-header">管理员登录</div>
+        <div class="layui-card-body">
+            <form class="layui-form">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">用户名</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="username" required lay-verify="required" placeholder="请输入用户名"
+                            autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">密码</label>
+                    <div class="layui-input-block">
+                        <input type="password" name="password" required lay-verify="required" placeholder="请输入密码"
+                            autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">验证码</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="captcha" required lay-verify="required" placeholder="请输入验证码" autocomplete="off"
+                            class="layui-input">
+                    </div>
+                    <div class="layui-form-mid layui-word-aux"><img src="{[:captcha_src()]}" class="captcha" alt="captcha" /></div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit lay-filter="login">登录</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+<script src="/static/js/jquery.js"></script>
+<script src="/static/layui/layui.js"></script>
+<script src="/static/js/popup.js"></script>
+<script src="/static/js/main.js"></script>
+<script>
+    layui.use('form', function () {
+        var form = layui.form;
+        form.on('submit(login)', function (data) {
+            var f = data.field;
+            var username = $.trim(f.username);
+            var password = $.trim(f.password);
+            var captcha = $.trim(f.captcha);
+            adminLogin(username, password, captcha);
+            return false;
+        });
+    });
+    var reloadCaptcha = function() {
+        $(".captcha").attr('src', $(".captcha").attr('src'));
+    }
+    $(".captcha").bind('click', function() {
+        reloadCaptcha();
+    })
+</script>
+
+</html>

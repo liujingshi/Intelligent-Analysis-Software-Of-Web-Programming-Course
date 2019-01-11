@@ -65,12 +65,15 @@ class Admin
         if ($this->checkMethod()) {
             $request = Request::instance();
             $post = $request->param();
+            if(!captcha_check($post['captcha'])){
+                return $this->state('fail');
+            };
             $data = [
                 'username' => $post['username'],
                 'password' => md5($post['password'])
             ];
             if (Db::table('admin')->where($data)->find()) {
-                Session::set('admin', '');
+                Session::set('admin', $post['username']);
                 return $this->state('success');
             } else {
                 return $this->state('fail');
