@@ -17,9 +17,9 @@ return [
     // 数据库名
     'database'        => 'web',
     // 用户名
-    'username'        => 'phpmyadmin',
+    'username'        => 'root',
     // 密码
-    'password'        => '123',
+    'password'        => '',
     // 端口
     'hostport'        => '3306',
     // 连接dsn

@@ -8,13 +8,32 @@
     <title>Web编程课程教学案例智能分析软件</title>
     <link rel="stylesheet" href="/static/layui/css/layui.css">
     <link rel="stylesheet" href="/static/css/main.css">
+    <style>
+        iframe {
+            width: calc(100% - 200px);
+            height: 100%;
+            margin-left: 200px;
+        }
+    </style>
 </head>
 
 <body>
-
+    <ul class="layui-nav layui-nav-tree layui-nav-side">
+        <li class="layui-nav-item layui-nav-itemed">
+            <a href="javascript:;">案例</a>
+            <dl class="layui-nav-child">
+                {[volist name="egs" id="eg"]}
+                <dd><a href="javascript:openPage({[$eg.id]});">{[$eg.name]}</a></dd>
+                {[/volist]}
+            </dl>
+        </li>
+        <li class="layui-nav-item"><a href="/admin">后台管理</a></li>
+    </ul>
+    <iframe id="eg" src="/pages/main" frameborder="0"></iframe>
 </body>
 <script src="/static/js/jquery.js"></script>
 <script src="/static/layui/layui.js"></script>
+<script src="/static/js/popup.js"></script>
 <script src="/static/js/main.js"></script>
 
 </html>

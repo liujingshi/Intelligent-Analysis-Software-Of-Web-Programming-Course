@@ -1,4 +1,8 @@
 
+layui.use('element', function () {
+    var element = layui.element;
+});
+
 popup.init() // 初始化弹出层
 
 /**
@@ -32,4 +36,54 @@ var adminLogin = function (username, password, captcha) {
     }
 }
 
+/**
+ * 打开案例
+ * @param {*} id 
+ */
+var openPage = function (id) {
+    $("#eg").attr("src", "/pages/eg" + id)
+}
+
+/**
+ * 删除案例
+ * @param {*} id 
+ */
+var delEg = function (id) {
+    $.post('/api/admin/delEg', {
+        id: id
+    }, function () { })
+}
+
+/**
+ * 添加用户
+ * @param {*} username 
+ * @param {*} password 
+ */
+var addUser = function (username, password) {
+    username = $.trim(username)
+    password = $.trim(password)
+    if (username == "" || password == "") {
+        popup.msg('用户名密码不能为空', 'no')
+    } else {
+        var load = popup.load('添加中...')
+        $.post('/api/admin/addUser', {
+            username: username,
+            password: password
+        }, function (res) {
+            popup.close(load)
+            var data = JSON.parse(res)
+            if (data.state == "success") {
+                layui.use('table', function () {
+                    var table = layui.table
+                    table.reload('userm', {
+                        url: '/api/admin/getUsers'
+                    })
+                })
+                popup.msg('添加成功', 'yes')
+            } else {
+                popup.msg('错误', 'cry')
+            }
+        })
+    }
+}
 

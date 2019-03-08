@@ -57,6 +57,48 @@ class Admin
     }
 
     /**
+     * table数据表格url数据格式
+     *  {
+     *   "code": 0,
+     *   "msg": "",
+     *   "count": 1000,
+     *   "data": [{}, {}]
+     *  } 
+     */
+    private function tableData($data) {
+        $result = [
+            "code" => 0,
+            "msg"  => "",
+            "count" => count($data),
+            "data" => $data
+        ];
+        return $result;
+    }
+
+    /**
+     * 删除一个案例的文件
+     */
+    private function delDir($dir) {
+        $dh=opendir($dir);
+        while ($file=readdir($dh)) {
+           if($file!="." && $file!="..") {
+              $fullpath=$dir."/".$file;
+              if(!is_dir($fullpath)) {
+                 unlink($fullpath);
+              } else {
+                 deldir($fullpath);
+              }
+           }
+        }
+        closedir($dh);
+        if(rmdir($dir)) {
+           return true;
+        } else {
+           return false;
+        }
+     }
+
+    /**
      * 管理员登录接口
      * 参数: Ajax POST 'username' 'password'
      * 返回值: JSON state => 'success' 'fail'
@@ -80,6 +122,64 @@ class Admin
             }
         } else {
             return $this->goto404();
+        }
+    }
+
+
+    /**
+     * 获取案例的table接口
+     */
+    public function getEgs() {
+        if ($this->check()) {
+            $data = Db::table('eg')->select();
+            return $this->tableData($data);
+        }
+        return $this->goto404();
+    }
+
+    /**
+     * 获取用户的table接口
+     */
+    public function getUsers() {
+        if ($this->check()) {
+            $data = Db::table('admin')->select();
+            return $this->tableData($data);
+        }
+        return $this->goto404();
+    }
+
+    /**
+     * 添加用户
+     */
+    public function addUser() {
+        if ($this->checkMethod()) {
+            if ($this->check()) {
+                $request = Request::instance();
+                $post = $request->param();
+                $username = $post['username'];
+                $password = md5($post['password']);
+                Db::table('admin')->insert([
+                    'username' => $username,
+                    'password' => $password
+                ]);
+                return $this->state('success');
+            }
+        }
+        return $this->goto404();
+    }
+
+    /**
+     * 删除案例
+     */
+    public function delEg() {
+        if ($this->checkMethod()) {
+            if ($this->check()) {
+                $request = Request::instance();
+                $post = $request->param();
+                $id = $post['id'];
+                Db::table('eg')->where('id', $id)->delete();
+                $this->delDir('./pages/eg'.$id);
+            }
         }
     }
 

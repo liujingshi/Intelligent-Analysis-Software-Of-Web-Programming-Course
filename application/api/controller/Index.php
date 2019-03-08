@@ -5,6 +5,6 @@ class Index
 {
     public function index()
     {
-        return "Hello World ???";
+        return md5("admin");
     }
 }
