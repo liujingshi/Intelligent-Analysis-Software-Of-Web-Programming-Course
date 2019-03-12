@@ -22,7 +22,7 @@
 <body>
     <ul class="layui-nav" lay-filter="">
         <li class="layui-nav-item layui-this"><a href="/admin">综合管理</a></li>
-        <li class="layui-nav-item"><a href="javascript:;">添加案例</a></li>
+        <li class="layui-nav-item"><a href="/">返回前台</a></li>
     </ul>
     <div style="height: 50px;"></div>
     <div class="layui-container">
@@ -164,8 +164,9 @@
             , page: false
             , cols: [[
                 { field: 'id', title: 'ID', width: '20%', sort: true, fixed: 'left' }
-                , { field: 'name', title: '案例名', width: '40%' }
-                , { fixed: 'right', width: '40%', align: 'center', toolbar: '#barDemo' }
+                , { field: 'name', title: '案例名', width: '30%' }
+                , { field: 'class_id', title: '分类ID', width: '20%' }
+                , { fixed: 'right', width: '30%', align: 'center', toolbar: '#barDemo' }
             ]]
         })
 
@@ -236,6 +237,11 @@
 
         form.on('submit(addClass)', function (data) {
             addClass(data.field.name)
+            return false
+        });
+
+        form.on('submit(addEg)', function (data) {
+            addEg(data.field.iclass, data.field.name)
             return false
         });
 

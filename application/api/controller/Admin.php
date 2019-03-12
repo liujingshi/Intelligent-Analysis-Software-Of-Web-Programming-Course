@@ -49,9 +49,10 @@ class Admin
      * 参数: 状态字符串
      * 返回值: JSON字符串
      */
-    private function state($state) {
+    private function state($state, $data = "") {
         $result = [
-            'state' => $state
+            'state' => $state,
+            'data' => $data
         ];
         return json_encode($result);
     }
@@ -116,6 +117,8 @@ class Admin
             ];
             if (Db::table('admin')->where($data)->find()) {
                 Session::set('admin', $post['username']);
+                $user = Db::table('admin')->where($data)->select();
+                Session::set('user_id', $user[0]['id']);
                 return $this->state('success');
             } else {
                 return $this->state('fail');
@@ -142,7 +145,7 @@ class Admin
      */
     public function getEgs() {
         if ($this->check()) {
-            $data = Db::table('eg')->select();
+            $data = Db::table('eg')->where('user_id', Session::get('user_id'))->select();
             return $this->tableData($data);
         }
         return $this->goto404();
@@ -173,6 +176,33 @@ class Admin
                     'username' => $username,
                     'password' => $password
                 ]);
+                return $this->state('success');
+            }
+        }
+        return $this->goto404();
+    }
+
+
+    /**
+     * 添加案例
+     */
+    public function addEg() {
+        if ($this->checkMethod()) {
+            if ($this->check()) {
+                $request = Request::instance();
+                $post = $request->param();
+                $name = $post['name'];
+                $class_id = $post['iclass'];
+                $user_id = Session::get('user_id');
+                $data = [
+                    'name' => $name,
+                    'class_id' => $class_id,
+                    'user_id' => $user_id
+                ];
+                Db::table('eg')->insert($data);
+                $eg = Db::table('eg')->where($data)->select();
+                $id = $eg[0]['id'];
+                mkdir('./pages/eg'.$id, 0777, true);
                 return $this->state('success');
             }
         }

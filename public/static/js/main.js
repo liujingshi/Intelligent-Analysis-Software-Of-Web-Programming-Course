@@ -87,7 +87,10 @@ var addUser = function (username, password) {
     }
 }
 
-
+/**
+ * 添加分类
+ * @param {*} name 
+ */
 var addClass = function (name) {
     name = $.trim(name)
     if (name == "") {
@@ -104,6 +107,35 @@ var addClass = function (name) {
                     var table = layui.table
                     table.reload('classm', {
                         url: '/api/admin/getClass'
+                    })
+                })
+                popup.msg('添加成功', 'yes')
+            } else {
+                popup.msg('错误', 'cry')
+            }
+        })
+    }
+}
+
+
+var addEg = function (iclass, name) {
+    iclass = $.trim(iclass)
+    name = $.trim(name)
+    if (name == "") {
+        popup.msg('案例名不能为空', 'no')
+    } else {
+        var load = popup.load('添加中...')
+        $.post('/api/admin/addEg', {
+            iclass: iclass,
+            name: name
+        }, function (res) {
+            popup.close(load)
+            var data = JSON.parse(res)
+            if (data.state == "success") {
+                layui.use('table', function () {
+                    var table = layui.table
+                    table.reload('egm', {
+                        url: '/api/admin/getEgs'
                     })
                 })
                 popup.msg('添加成功', 'yes')

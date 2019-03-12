@@ -29,14 +29,16 @@
 
 <body>
     <ul class="layui-nav layui-nav-tree layui-nav-side">
-        <li class="layui-nav-item layui-nav-itemed">
-            <a href="javascript:;">案例</a>
+        {[volist name="iclass" id="c"]}
+        <li class="layui-nav-item">
+            <a href="javascript:;">{[$key]}</a>
             <dl class="layui-nav-child">
-                {[volist name="egs" id="eg"]}
+                {[volist name="c" id="eg"]}
                 <dd><a href="javascript:openPage({[$eg.id]});">{[$eg.name]}</a></dd>
                 {[/volist]}
             </dl>
         </li>
+        {[/volist]}
         <li class="layui-nav-item"><a href="/admin">后台管理</a></li>
     </ul>
     <div class="right">
