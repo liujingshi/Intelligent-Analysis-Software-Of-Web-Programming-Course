@@ -9,10 +9,20 @@
     <link rel="stylesheet" href="/static/layui/css/layui.css">
     <link rel="stylesheet" href="/static/css/main.css">
     <style>
-        iframe {
+        .right {
             width: calc(100% - 200px);
             height: 100%;
             margin-left: 200px;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+        }
+        .tab {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
         }
     </style>
 </head>
@@ -29,7 +39,26 @@
         </li>
         <li class="layui-nav-item"><a href="/admin">后台管理</a></li>
     </ul>
-    <iframe id="eg" src="/pages/main" frameborder="0"></iframe>
+    <div class="right">
+        <div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+            <ul class="layui-tab-title">
+                <li class="layui-this">案例预览</li>
+                <li>HTML代码</li>
+                <li>CSS代码</li>
+                <li>JS代码</li>
+                <li>静态文件</li>
+            </ul>
+            <div class="layui-tab-content tab" style="height: 100px;">
+                <div class="layui-tab-item layui-show tab">
+                    <iframe id="eg" src="/pages/main" frameborder="0"></iframe>
+                </div>
+                <div class="layui-tab-item">内容2</div>
+                <div class="layui-tab-item">内容3</div>
+                <div class="layui-tab-item">内容4</div>
+                <div class="layui-tab-item">内容5</div>
+            </div>
+        </div>
+    </div>
 </body>
 <script src="/static/js/jquery.js"></script>
 <script src="/static/layui/layui.js"></script>

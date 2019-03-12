@@ -125,6 +125,17 @@ class Admin
         }
     }
 
+    /**
+     * 获取分类的table接口
+     */
+    public function getClass() {
+        if ($this->check()) {
+            $data = Db::table('iclass')->select();
+            return $this->tableData($data);
+        }
+        return $this->goto404();
+    }
+
 
     /**
      * 获取案例的table接口
@@ -161,6 +172,25 @@ class Admin
                 Db::table('admin')->insert([
                     'username' => $username,
                     'password' => $password
+                ]);
+                return $this->state('success');
+            }
+        }
+        return $this->goto404();
+    }
+
+    
+    /**
+     * 添加分类
+     */
+    public function addClass() {
+        if ($this->checkMethod()) {
+            if ($this->check()) {
+                $request = Request::instance();
+                $post = $request->param();
+                $name = $post['name'];
+                Db::table('iclass')->insert([
+                    'name' => $name
                 ]);
                 return $this->state('success');
             }

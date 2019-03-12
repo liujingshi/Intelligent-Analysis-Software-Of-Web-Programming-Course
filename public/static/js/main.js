@@ -87,3 +87,30 @@ var addUser = function (username, password) {
     }
 }
 
+
+var addClass = function (name) {
+    name = $.trim(name)
+    if (name == "") {
+        popup.msg('分类名不能为空', 'no')
+    } else {
+        var load = popup.load('添加中...')
+        $.post('/api/admin/addClass', {
+            name: name
+        }, function (res) {
+            popup.close(load)
+            var data = JSON.parse(res)
+            if (data.state == "success") {
+                layui.use('table', function () {
+                    var table = layui.table
+                    table.reload('classm', {
+                        url: '/api/admin/getClass'
+                    })
+                })
+                popup.msg('添加成功', 'yes')
+            } else {
+                popup.msg('错误', 'cry')
+            }
+        })
+    }
+}
+
