@@ -124,12 +124,22 @@
         </div>
     </div>
 </body>
+<div class="popup-div" id="popup-div">
+    <blockquote class="layui-elem-quote layui-quote-nm" id="nowdir">/</blockquote>
+    <div class="layui-btn-group">
+        <button class="layui-btn layui-btn-sm layui-btn-primary">返回上级目录</button>
+        <button class="layui-btn layui-btn-sm layui-btn-primary" id="newdir">新建目录</button>
+        <button class="layui-btn layui-btn-sm layui-btn-primary">上传文件</button>
+    </div>
+    <table id="sm" lay-filter="sm"></table>
+</div>
 <script src="/static/js/jquery.js"></script>
 <script src="/static/layui/layui.js"></script>
 <script src="/static/js/popup.js"></script>
 <script src="/static/js/main.js"></script>
 <script type="text/html" id="barDemo">
     <a class="layui-btn layui-btn-xs" lay-event="detail">查看</a>
+    <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit">管理</a>
     <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
 </script>
 <script type="text/html" id="barDemo2">
@@ -140,10 +150,20 @@
     <a class="layui-btn layui-btn-xs" lay-event="detail">修改</a>
     <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
 </script>
+<script type="text/html" id="barDemo4">
+    <a class="layui-btn layui-btn-xs" lay-event="detail">进入</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
 <script>
-    layui.use(['table', 'form'], function () {
-        var table = layui.table
+    var layer = null
+    var table = null
+    var upload = null
+    var eg = 'main'
+    layui.use(['table', 'form', 'upload', 'layer'], function () {
+        table = layui.table
         var form = layui.form
+        upload = layui.upload
+        layer = layui.layer
 
         table.render({
             elem: '#classm'
@@ -165,8 +185,8 @@
             , cols: [[
                 { field: 'id', title: 'ID', width: '20%', sort: true, fixed: 'left' }
                 , { field: 'name', title: '案例名', width: '30%' }
-                , { field: 'class_id', title: '分类ID', width: '20%' }
-                , { fixed: 'right', width: '30%', align: 'center', toolbar: '#barDemo' }
+                , { field: 'class_id', title: '分类ID', width: '15%' }
+                , { fixed: 'right', width: '35%', align: 'center', toolbar: '#barDemo' }
             ]]
         })
 
@@ -179,6 +199,22 @@
                 { field: 'id', title: 'ID', width: '20%', sort: true, fixed: 'left' }
                 , { field: 'username', title: '用户名', width: '40%' }
                 , { fixed: 'right', width: '40%', align: 'center', toolbar: '#barDemo2' }
+            ]]
+        })
+
+        table.render({
+            elem: '#sm'
+            , height: 400
+            , url: '/api/admin/getDir'
+            , where: {
+                eg: 'main',
+                dir: '/'
+            }
+            , page: false
+            , cols: [[
+                { field: 'name', title: '名称', width: '60%' }
+                , { field: 'ftype', title: '类型', width: '20%' }
+                , { fixed: 'right', width: '20%', align: 'center', toolbar: '#barDemo4' }
             ]]
         })
 
@@ -205,6 +241,17 @@
 
             if (layEvent === 'detail') {
                 window.open('/pages/eg' + data.id, '_blank').location;
+            } else if (layEvent === 'edit') {
+                eg = 'eg' + data.id
+                popup.html('popup-div', 800, 600, data.name)
+                $('#nowdir').html('/');
+                table.reload('sm', {
+                    url: '/api/admin/getDir',
+                    where: {
+                        'eg': eg,
+                        'dir': '/'
+                    }
+                })
             } else if (layEvent === 'del') {
                 layer.confirm('真的删除`' + data.name + '`么', function (index) {
                     delEg(data.id);
@@ -230,6 +277,31 @@
             }
         })
 
+        table.on('tool(sm)', function (obj) {
+            var data = obj.data;
+            var layEvent = obj.event;
+            var tr = obj.tr;
+
+            if (layEvent === 'detail') {
+                if (data.ftype == '目录') {
+                    $("#nowdir").html($("#nowdir").html() + data.name + "/")
+                    table.reload('sm', {
+                        url: '/api/admin/getDir',
+                        where: {
+                            'eg': eg,
+                            'dir': $('#nowdir').html()
+                        }
+                    })
+                }
+            } else if (layEvent === 'del') {
+                layer.confirm('真的删除`' + data.name + '`么', function (index) {
+                    // delEg(data.id);
+                    obj.del();
+                    layer.close(index);
+                });
+            }
+        })
+
         form.on('submit(addUser)', function (data) {
             addUser(data.field.username, data.field.password)
             return false
@@ -246,6 +318,26 @@
         });
 
     })
+
+    $("#newdir").click(function () {
+        layer.prompt({ title: "请输入目录名", formType: 3 }, function (pass, index) {
+            layer.close(index);
+            $.post('/api/admin/newdir', {
+                'eg': eg,
+                'dir': $('#nowdir').html(),
+                'newdir': pass
+            }, function () {
+                table.reload('sm', {
+                    url: '/api/admin/getDir',
+                    where: {
+                        'eg': eg,
+                        'dir': $('#nowdir').html()
+                    }
+                })
+            })
+        })
+    })
+
 </script>
 
 </html>

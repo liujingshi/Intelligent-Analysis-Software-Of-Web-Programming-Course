@@ -1,6 +1,6 @@
 var popup = {
 
-    layer : null,
+    layer: null,
 
     icon: {
         yes: 1,
@@ -13,9 +13,9 @@ var popup = {
         load: 16
     },
 
-    init: function() {
+    init: function () {
         var that = this;
-        layui.use('layer', function() {
+        layui.use('layer', function () {
             that.layer = layui.layer;
         });
     },
@@ -36,9 +36,9 @@ var popup = {
 
     alert: function (msg, title = "提示", icon = "none", done = function (index) { layer.close(index) }) {
         if (icon == "none") {
-            return layer.alert(msg, { title: title}, done)
+            return layer.alert(msg, { title: title }, done)
         } else {
-            return layer.alert(msg, { icon: this.icon[icon], title: title}, done)
+            return layer.alert(msg, { icon: this.icon[icon], title: title }, done)
         }
     },
 

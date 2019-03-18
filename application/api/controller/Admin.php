@@ -163,6 +163,38 @@ class Admin
     }
 
     /**
+     * 获取目录的table接口
+     */
+    public function getDir() {
+        if ($this->check()) {
+            $request = Request::instance();
+            $post = $request->param();
+            $root = './pages/'.$post['eg'];
+            $dir = $root.$post['dir'];
+            $sdir = scandir($dir);
+            $data = [];
+            foreach ($sdir as $t) {
+                if ($t == '.' || $t == '..') {
+                    continue;
+                }
+                $f = [
+                    'name' => $t,
+                    'ftype' => ''
+                ];
+                if (is_dir($dir.$t)) {
+                    $f['ftype'] = '目录';
+                    $data[] = $f;
+                } else if (is_file($dir.$t)) {
+                    $f['ftype'] = '文件';
+                    $data[] = $f;
+                }
+            }
+            return $this->tableData($data);
+        }
+        return $this->goto404();
+    }
+
+    /**
      * 添加用户
      */
     public function addUser() {
@@ -239,8 +271,30 @@ class Admin
                 $id = $post['id'];
                 Db::table('eg')->where('id', $id)->delete();
                 $this->delDir('./pages/eg'.$id);
+                return $this->state('success');
             }
         }
+        return $this->goto404();
+    }
+
+    /**
+     * 新建目录
+     */
+    public function newdir() {
+        if ($this->checkMethod()) {
+            if ($this->check()) {
+                $request = Request::instance();
+                $post = $request->param();
+                $eg = $post['eg'];
+                $dir = $post['dir'];
+                $newdir = $post['newdir'];
+                $root = './pages/'.$eg;
+                $dir = $root.$dir;
+                mkdir($dir.$newdir, 0777, true);
+                return $this->state('success');
+            }
+        }
+        return $this->goto404();
     }
 
 }
