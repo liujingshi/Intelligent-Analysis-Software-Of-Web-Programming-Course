@@ -127,9 +127,9 @@
 <div class="popup-div" id="popup-div">
     <blockquote class="layui-elem-quote layui-quote-nm" id="nowdir">/</blockquote>
     <div class="layui-btn-group">
-        <button class="layui-btn layui-btn-sm layui-btn-primary">返回上级目录</button>
+        <button class="layui-btn layui-btn-sm layui-btn-primary" id="returnup">返回上级目录</button>
         <button class="layui-btn layui-btn-sm layui-btn-primary" id="newdir">新建目录</button>
-        <button class="layui-btn layui-btn-sm layui-btn-primary">上传文件</button>
+        <button class="layui-btn layui-btn-sm layui-btn-primary" id="upload0">上传文件</button>
     </div>
     <table id="sm" lay-filter="sm"></table>
 </div>
@@ -159,6 +159,8 @@
     var table = null
     var upload = null
     var eg = 'main'
+    var uploadid1 = "upload"
+    var uploadid2 = 0
     layui.use(['table', 'form', 'upload', 'layer'], function () {
         table = layui.table
         var form = layui.form
@@ -252,6 +254,30 @@
                         'dir': '/'
                     }
                 })
+                $("#" + uploadid1 + uploadid2).attr("id", uploadid1 + (uploadid2 + 1))
+                upload.render({
+                    elem: '#' + uploadid1 + uploadid2
+                    , url: '/api/admin/upload'
+                    , accept: 'file'
+                    , data: {
+                        'eg': eg,
+                        'dir': $('#nowdir').html()
+                    }
+                    , done: function (res) {
+                        table.reload('sm', {
+                            url: '/api/admin/getDir',
+                            where: {
+                                'eg': eg,
+                                'dir': $('#nowdir').html()
+                            }
+                        })
+                    }
+                    , error: function () {
+                        //请求异常回调
+                    }
+                });
+                uploadid2++
+
             } else if (layEvent === 'del') {
                 layer.confirm('真的删除`' + data.name + '`么', function (index) {
                     delEg(data.id);
@@ -292,6 +318,29 @@
                             'dir': $('#nowdir').html()
                         }
                     })
+                    $("#" + uploadid1 + uploadid2).attr("id", uploadid1 + (uploadid2 + 1))
+                    upload.render({
+                        elem: '#' + uploadid1 + uploadid2
+                        , url: '/api/admin/upload'
+                        , accept: 'file'
+                        , data: {
+                            'eg': eg,
+                            'dir': $('#nowdir').html()
+                        }
+                        , done: function (res) {
+                            table.reload('sm', {
+                                url: '/api/admin/getDir',
+                                where: {
+                                    'eg': eg,
+                                    'dir': $('#nowdir').html()
+                                }
+                            })
+                        }
+                        , error: function () {
+                            //请求异常回调
+                        }
+                    });
+                    uploadid2++
                 }
             } else if (layEvent === 'del') {
                 layer.confirm('真的删除`' + data.name + '`么', function (index) {
@@ -317,6 +366,7 @@
             return false
         });
 
+
     })
 
     $("#newdir").click(function () {
@@ -335,6 +385,26 @@
                     }
                 })
             })
+        })
+    })
+
+    $("#returnup").click(function () {
+        var ndir = $('#nowdir').html()
+        if (ndir == "/") {
+            return
+        }
+        var rdir = ndir.split("/")
+        var dir = ""
+        for (var i = 0; i < rdir.length - 2; i++) {
+            dir += rdir[i] + "/"
+        }
+        $('#nowdir').html(dir)
+        table.reload('sm', {
+            url: '/api/admin/getDir',
+            where: {
+                'eg': eg,
+                'dir': dir
+            }
         })
     })
 

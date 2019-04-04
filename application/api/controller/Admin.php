@@ -297,4 +297,24 @@ class Admin
         return $this->goto404();
     }
 
+    /**
+     * 上传文件接口
+     */
+    public function upload() {
+        if ($this->check()) {
+            $request = Request::instance();
+            $post = $request->param();
+            $file = request()->file('file');
+            if($file){
+                $info = $file->move('./pages/' . $post['eg'] . $post['dir']);
+                if ($info) {
+                    return $this->state("success");
+                } else {
+                    return $this->state("error");
+                }
+            }
+        }
+        return $this->goto404();
+    }
+
 }
