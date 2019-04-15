@@ -129,9 +129,19 @@
     <div class="layui-btn-group">
         <button class="layui-btn layui-btn-sm layui-btn-primary" id="returnup">返回上级目录</button>
         <button class="layui-btn layui-btn-sm layui-btn-primary" id="newdir">新建目录</button>
-        <button class="layui-btn layui-btn-sm layui-btn-primary" id="upload0">上传文件</button>
+        <button class="layui-btn layui-btn-sm layui-btn-primary" id="upload">上传文件</button>
     </div>
     <table id="sm" lay-filter="sm"></table>
+</div>
+<div class="popup-div" id="upload-div">
+    <form action="/api/Admin/upload/" method="POST" target="frame1" id="upload-form" enctype="multipart/form-data">
+        <input type="hidden" name="eg" value="">
+        <input type="hidden" name="dir" value="">
+        <input type="file" name="file" id="upload-file">
+        <hr>
+        <input type="submit" value="上传">
+    </form>
+    <iframe name="frame1" class="popup-div" frameborder="0" height="40"></iframe>
 </div>
 <script src="/static/js/jquery.js"></script>
 <script src="/static/layui/layui.js"></script>
@@ -157,14 +167,10 @@
 <script>
     var layer = null
     var table = null
-    var upload = null
     var eg = 'main'
-    var uploadid1 = "upload"
-    var uploadid2 = 0
-    layui.use(['table', 'form', 'upload', 'layer'], function () {
+    layui.use(['table', 'form', 'layer'], function () {
         table = layui.table
         var form = layui.form
-        upload = layui.upload
         layer = layui.layer
 
         table.render({
@@ -254,29 +260,7 @@
                         'dir': '/'
                     }
                 })
-                $("#" + uploadid1 + uploadid2).attr("id", uploadid1 + (uploadid2 + 1))
-                upload.render({
-                    elem: '#' + uploadid1 + uploadid2
-                    , url: '/api/admin/upload'
-                    , accept: 'file'
-                    , data: {
-                        'eg': eg,
-                        'dir': $('#nowdir').html()
-                    }
-                    , done: function (res) {
-                        table.reload('sm', {
-                            url: '/api/admin/getDir',
-                            where: {
-                                'eg': eg,
-                                'dir': $('#nowdir').html()
-                            }
-                        })
-                    }
-                    , error: function () {
-                        //请求异常回调
-                    }
-                });
-                uploadid2++
+
 
             } else if (layEvent === 'del') {
                 layer.confirm('真的删除`' + data.name + '`么', function (index) {
@@ -318,33 +302,16 @@
                             'dir': $('#nowdir').html()
                         }
                     })
-                    $("#" + uploadid1 + uploadid2).attr("id", uploadid1 + (uploadid2 + 1))
-                    upload.render({
-                        elem: '#' + uploadid1 + uploadid2
-                        , url: '/api/admin/upload'
-                        , accept: 'file'
-                        , data: {
-                            'eg': eg,
-                            'dir': $('#nowdir').html()
-                        }
-                        , done: function (res) {
-                            table.reload('sm', {
-                                url: '/api/admin/getDir',
-                                where: {
-                                    'eg': eg,
-                                    'dir': $('#nowdir').html()
-                                }
-                            })
-                        }
-                        , error: function () {
-                            //请求异常回调
-                        }
-                    });
-                    uploadid2++
+
                 }
             } else if (layEvent === 'del') {
                 layer.confirm('真的删除`' + data.name + '`么', function (index) {
-                    // delEg(data.id);
+                    var ndir = $('#nowdir').html()
+                    if (data.ftype == '目录') {
+                        delEgDir(eg, ndir + data.name)
+                    } else {
+                        delFile(eg, ndir + data.name)
+                    }
                     obj.del();
                     layer.close(index);
                 });
@@ -406,6 +373,25 @@
                 'dir': dir
             }
         })
+    })
+
+    $("#upload").click(function () {
+        $("#upload-form")[0].eg.value = eg
+        $("#upload-form")[0].dir.value = $('#nowdir').html()
+        popup.html('upload-div', 300, 150, "上传文件")
+    })
+
+    $("#upload-form").submit(function () {
+        popup.load("上传中...", 1500)
+        setTimeout(function () {
+            table.reload('sm', {
+                url: '/api/admin/getDir',
+                where: {
+                    'eg': eg,
+                    'dir': $('#nowdir').html()
+                }
+            })
+        }, 1500)
     })
 
 </script>

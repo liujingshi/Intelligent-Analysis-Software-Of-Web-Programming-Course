@@ -8,21 +8,38 @@
     <title>Web编程课程教学案例智能分析软件</title>
     <link rel="stylesheet" href="/static/layui/css/layui.css">
     <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="/static/codemirror/lib/codemirror.css">
+    <link rel="stylesheet" href="/static/codemirror/theme/monokai.css">
     <style>
         .right {
             width: calc(100% - 200px);
             height: 100%;
             margin-left: 200px;
         }
+
         iframe {
             width: 100%;
             height: 100%;
         }
+
         .tab {
-            position: fixed;
+            height: 100%;
+        }
+
+        .Codemirror {
             width: 100%;
             height: 100%;
-            overflow-y: auto;
+            font-size: 20px;
+        }
+
+        .old-new {
+            display: flex;
+            height: 530px;
+        }
+
+        .old-new>div {
+            flex: 1;
+            height: 100%;
         }
     </style>
 </head>
@@ -42,29 +59,140 @@
         <li class="layui-nav-item"><a href="/admin">后台管理</a></li>
     </ul>
     <div class="right">
-        <div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+        <div class="layui-tab layui-tab-brief" lay-filter="tabtab" style="height: calc(100% - 75px)">
             <ul class="layui-tab-title">
                 <li class="layui-this">案例预览</li>
+                <li>编辑代码</li>
                 <li>HTML代码</li>
                 <li>CSS代码</li>
                 <li>JS代码</li>
                 <li>静态文件</li>
             </ul>
-            <div class="layui-tab-content tab" style="height: 100px;">
+            <div class="layui-tab-content tab">
                 <div class="layui-tab-item layui-show tab">
                     <iframe id="eg" src="/pages/main" frameborder="0"></iframe>
                 </div>
-                <div class="layui-tab-item">内容2</div>
-                <div class="layui-tab-item">内容3</div>
-                <div class="layui-tab-item">内容4</div>
-                <div class="layui-tab-item">内容5</div>
+                <div class="layui-tab-item">
+                    <blockquote class="layui-elem-quote">
+                        <button class="layui-btn" id="save-code">保存代码</button>
+                    </blockquote>
+                    <textarea class="Codemirror" id="code-all"></textarea>
+                </div>
+                <div class="layui-tab-item">
+                    <textarea class="Codemirror" id="code-html"></textarea>
+                </div>
+                <div class="layui-tab-item">
+                    <textarea class="Codemirror" id="code-css"></textarea>
+                </div>
+                <div class="layui-tab-item">
+                    <textarea class="Codemirror" id="code-js"></textarea>
+                </div>
+                <div class="layui-tab-item" id="static-files" style="background: #ebebeb;">
+
+                </div>
             </div>
         </div>
     </div>
 </body>
+<div class="popup-div" id="change-div">
+    <div class="old-new">
+        <div><iframe id="old" src="" frameborder="0"></iframe></div>
+        <div><iframe id="new" src="" frameborder="0"></iframe></div>
+    </div>
+</div>
 <script src="/static/js/jquery.js"></script>
 <script src="/static/layui/layui.js"></script>
 <script src="/static/js/popup.js"></script>
+<script src="/static/codemirror/lib/codemirror.js"></script>
+<script src="/static/codemirror/addon/edit/closetag.js"></script>
+<script src="/static/codemirror/mode/xml/xml.js"></script>
+<script src="/static/codemirror/mode/javascript/javascript.js"></script>
+<script src="/static/codemirror/mode/css/css.js"></script>
+<script src="/static/codemirror/mode/htmlmixed/htmlmixed.js"></script>
+<script src="/static/js/code-blast.js"></script>
 <script src="/static/js/main.js"></script>
+
+<script>
+
+    var eg = null
+
+    var codeEdit = {
+        lineNumbers: true, // 行号
+        mode: "htmlmixed",
+        theme: 'monokai',
+        lineWrapping: true, // 代码折叠
+        matchBrackets: true, // 括号匹配
+        indentUnit: 4, // 缩进空格数
+        smartIndent: true, // 自动缩进
+    };
+    var code_all = CodeMirror.fromTextArea($("#code-all")[0], codeEdit);
+    var code_html = CodeMirror.fromTextArea($("#code-html")[0], codeEdit);
+    var code_css = CodeMirror.fromTextArea($("#code-css")[0], codeEdit);
+    var code_js = CodeMirror.fromTextArea($("#code-js")[0], codeEdit);
+
+    code_all.setSize('100%', '100%');
+    code_html.setSize('100%', '100%');
+    code_css.setSize('100%', '100%');
+    code_js.setSize('100%', '100%');
+
+    layui.use('element', function () {
+        var element = layui.element
+        element.on('tab(tabtab)', function (data) {
+            code_all.setValue(egData.all);
+            code_html.setValue(egData.html);
+            code_css.setValue(egData.css);
+            code_js.setValue(egData.js);
+        });
+    })
+
+
+    var card1 = '<div class="layui-card"><div class="layui-card-header">'
+    var card2 = '</div><div class="layui-card-body">'
+    var card3 = '</div></div>'
+    var code1 = '<textarea class="Codemirror" id="'
+    var code2 = '"></textarea>'
+    var btn1 = ' - <button onclick="save_code(\''
+    var btn2 = '\', '
+    var btn3 = ', \''
+    var btn4 = '\')" class="layui-btn layui-btn-normal layui-btn-xs">保存代码</button>'
+
+    var code_css_temp = []
+    var code_js_temp = []
+
+    var setStaticFiles = function () {
+        $("#static-files").html("")
+        for (var i in egData.static.css) {
+            $("#static-files").append(card1 + egData.static.css[i].name +
+                btn1 + "css" + btn2 + i + btn3 + egData.static.css[i].name + btn4
+                + card2 + code1 + "codecss" + i + code2 + card3)
+            var code_css_tem = CodeMirror.fromTextArea($("#codecss" + i)[0], codeEdit);
+            code_css_tem.setSize('100%', '100%');
+            code_css_tem.setValue(egData.static.css[i].text);
+            code_css_temp.push(code_css_tem)
+        }
+        for (var i in egData.static.js) {
+            $("#static-files").append(card1 + egData.static.js[i].name +
+                btn1 + "js" + btn2 + i + btn3 + egData.static.js[i].name + btn4
+                + card2 + code1 + "codejs" + i + code2 + card3)
+            var code_js_tem = CodeMirror.fromTextArea($("#codejs" + i)[0], codeEdit);
+            code_js_tem.setSize('100%', '100%');
+            code_js_tem.setValue(egData.static.js[i].text);
+            code_js_temp.push(code_js_tem)
+        }
+    }
+
+    $("#save-code").click(function () {
+        change(eg, "index.html", code_all.getValue())
+    })
+
+    function save_code(type, id, name) {
+        if (type == "js") {
+            change(eg, name, code_js_temp[id].getValue())
+        } else if (type == "css") {
+            change(eg, name, code_css_temp[id].getValue())
+        }
+    }
+
+</script>
 
 </html>

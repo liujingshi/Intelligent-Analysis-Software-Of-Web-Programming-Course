@@ -41,7 +41,9 @@ var adminLogin = function (username, password, captcha) {
  * @param {*} id 
  */
 var openPage = function (id) {
+    eg = "eg" + id
     $("#eg").attr("src", "/pages/eg" + id)
+    analyze("eg" + id)
 }
 
 /**
@@ -117,7 +119,11 @@ var addClass = function (name) {
     }
 }
 
-
+/**
+ * 添加案例
+ * @param {*} iclass 
+ * @param {*} name 
+ */
 var addEg = function (iclass, name) {
     iclass = $.trim(iclass)
     name = $.trim(name)
@@ -144,5 +150,51 @@ var addEg = function (iclass, name) {
             }
         })
     }
+}
+
+
+var delEgDir = function (eg, dir) {
+    $.post('/api/admin/delEgDir', {
+        eg: eg,
+        dir: dir
+    }, function () { })
+}
+
+var delFile = function (eg, dir) {
+    $.post('/api/admin/delFile', {
+        eg: eg,
+        dir: dir
+    }, function () { })
+}
+
+var egData = null
+
+var analyze = function (eg) {
+    $.post('/api/index/analyze', {
+        eg: eg
+    }, function (res) {
+        var data = JSON.parse(res)
+        egData = data
+        setStaticFiles()
+        code_all.setValue(egData.all);
+        code_html.setValue(egData.html);
+        code_css.setValue(egData.css);
+        code_js.setValue(egData.js);
+    })
+}
+
+var change = function (eg, name, text) {
+    var load = popup.load("修改中...")
+    $.post('/api/index/change', {
+        eg: eg,
+        name: name,
+        text: text
+    }, function (res) {
+        popup.close(load)
+        $("#old").attr("src", "/pages/temp")
+        $("#new").attr("src", "/pages/" + eg)
+        $("#eg").attr("src", "/pages/" + eg)
+        popup.html('change-div', 1600, 600, "修改前后对比")
+    })
 }
 

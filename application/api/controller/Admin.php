@@ -87,7 +87,7 @@ class Admin
               if(!is_dir($fullpath)) {
                  unlink($fullpath);
               } else {
-                 deldir($fullpath);
+                 $this->delDir($fullpath);
               }
            }
         }
@@ -278,6 +278,40 @@ class Admin
     }
 
     /**
+     * 删除目录 
+     */
+    public function delEgDir() {
+        if ($this->checkMethod()) {
+            if ($this->check()) {
+                $request = Request::instance();
+                $post = $request->param();
+                $eg = $post['eg'];
+                $dir = $post['dir'];
+                $this->delDir('./pages/'.$eg.$dir);
+                return $this->state('success');
+            }
+        }
+        return $this->goto404();
+    }
+
+    /**
+     * 删除文件
+     */
+    public function delFile() {
+        if ($this->checkMethod()) {
+            if ($this->check()) {
+                $request = Request::instance();
+                $post = $request->param();
+                $eg = $post['eg'];
+                $dir = $post['dir'];
+                unlink('./pages/'.$eg.$dir);
+                return $this->state('success');
+            }
+        }
+        return $this->goto404();
+    }
+
+    /**
      * 新建目录
      */
     public function newdir() {
@@ -304,15 +338,8 @@ class Admin
         if ($this->check()) {
             $request = Request::instance();
             $post = $request->param();
-            $file = request()->file('file');
-            if($file){
-                $info = $file->move('./pages/' . $post['eg'] . $post['dir']);
-                if ($info) {
-                    return $this->state("success");
-                } else {
-                    return $this->state("error");
-                }
-            }
+            move_uploaded_file($_FILES["file"]["tmp_name"], './pages/' . $post['eg'] . $post['dir'] . $_FILES["file"]["name"]);
+            return $this->state("success");
         }
         return $this->goto404();
     }
