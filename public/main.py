@@ -18,7 +18,8 @@ def readFile(fileName):
     return fileObj
 
 def notIsFrame(name):
-    notUseStatic = ['min.js', 'min.css', 'jquery', 'Jquery', 'jQuery', 'JQUERY', 'layui', 'LAYUI', 'bootstrap', 'Bootstrap', 'BootStrap', 'BOOTSTRAP']
+    notUseStatic = ['min.js', 'min.css', 'jquery', 'Jquery', 'jQuery', 'JQUERY', 'layui', 'LAYUI', 'bootstrap', 'Bootstrap', 'BootStrap', 'BOOTSTRAP', 
+    'skill-bar', 'skill_bar', 'SkillBar', 'Skill-Bar', 'SKILL-BAR', 'normalize', 'Normalize', 'NORMALIZE', 'font', 'fonts']
     for s in notUseStatic:
         if s in name:
             return False
